@@ -8,6 +8,11 @@
     state=directory
     owner={{mysql_unix_backup_user}}
 
+
+# TODO: here I just consider debian-based distributions...
+- name: Installs python-mysqldb
+  apt: name=python-mysqldb state=installed
+
 - name: Create mysql backup user
   mysql_user: name={{mysql_backup_user}}
     login_host={{mysql_backup_host}}
