@@ -1,0 +1,33 @@
+---
+- name: Install unix backup user
+  user: name={{mysql_unix_backup_user}}
+    state=present
+
+- name: Create backup path
+  file: path={{mysql_backup_path}}
+    state=directory
+    owner={{mysql_unix_backup_user}}
+
+- name: Create mysql backup user
+  mysql_user: name={{mysql_backup_user}}
+    login_host={{mysql_backup_host}}
+    login_user={{mysql_admin_user}}
+    login_password={{mysql_admin_password}}
+    password={{mysql_backup_password}}
+    priv=*.*:select
+    state=present
+
+
+- name: Add backup cron job
+  cron: name=dump_mysql_{{item}}
+    user={{mysql_unix_backup_user}}
+    special_time={{mysql_backup_cron_time}}
+    job="mysqldump -h{{mysql_backup_host}} -u{{mysql_backup_user}} -p{{mysql_backup_password}} {{item}} |bzip2 >{{mysql_backup_path}}/{{item}}_`date +%Y-%m-%d_%H:%M`.sql.bz2"
+  with_items: mysql_backup_databases
+
+- name: Remove backup cronjob
+  cron: name=dump_mysql_{{item}}
+    state=absent
+  with_items: mysql_backup_remove_databases
+
+
