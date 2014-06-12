@@ -27,7 +27,7 @@
   cron: name=dump_mysql_{{item}}
     user={{mysql_unix_backup_user}}
     special_time={{mysql_backup_cron_time}}
-    job="mysqldump -h{{mysql_backup_host}} -u{{mysql_backup_user}} -p{{mysql_backup_password}} {{item}} |bzip2 >{{mysql_backup_path}}/{{item}}_`date +%Y-%m-%d_%H:%M`.sql.bz2"
+    job="/usr/bin/mysqldump -h{{mysql_backup_host}} -u{{mysql_backup_user}} -p{{mysql_backup_password}} {{item}} |bzip2 >{{mysql_backup_path}}/{{item}}_`date +%Y-%m-%d_%H:%M`.sql.bz2"
   with_items: mysql_backup_databases
 
 - name: Remove backup cronjob
