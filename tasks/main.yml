@@ -1,12 +1,12 @@
 ---
 - name: Install unix backup user
   user: name={{mysql_unix_backup_user}}
-    state=present
+    state=present shell="/bin/sh"
 
 - name: Create backup path
   file: path={{mysql_backup_path}}
     state=directory
-    owner={{mysql_unix_backup_user}}
+    owner={{mysql_unix_backup_user}} mode=0755
 
 
 # TODO: here I just consider debian-based distributions...
@@ -27,7 +27,7 @@
   cron: name=dump_mysql_{{item}}
     user={{mysql_unix_backup_user}}
     special_time={{mysql_backup_cron_time}}
-    job="/usr/bin/mysqldump -h{{mysql_backup_host}} -u{{mysql_backup_user}} -p{{mysql_backup_password}} {{item}} |bzip2 >{{mysql_backup_path}}/{{item}}_`date +%Y-%m-%d_%H:%M`.sql.bz2"
+    job="/usr/bin/mysqldump -h{{mysql_backup_host}} -u{{mysql_backup_user}} -p{{mysql_backup_password}} {{item}} &>{{mysql_backup_path}}/{{item}}.log |bzip2 >{{mysql_backup_path}}/{{item}}_`date +\%Y-\%m-\%d_\%H:\%M`.sql.bz2"
   with_items: mysql_backup_databases
 
 - name: Remove backup cronjob
